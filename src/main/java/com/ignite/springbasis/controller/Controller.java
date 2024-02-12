@@ -6,10 +6,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 
 @RestController
@@ -31,11 +34,37 @@ public class Controller {
     return "getzinho query " + allParams.entrySet();
   }
 
-  @PostMapping("/posting")
-  public String post(@RequestBody User user) {
-      //TODO: process POST request
+  @PostMapping("/posting-body")
+  public String postWithBody(@RequestBody User user) {
       return "post success " + user.username();
   }
+
+  @PostMapping("/posting-header")
+  public String postWithHeader(@RequestHeader("name") String name) {
+      return "post success " + name;
+  }
+
+  @PostMapping("/posting-header-list")
+  public String postWithHeaders(@RequestHeader Map<String, String> headers) {
+      return "post success " + headers.entrySet();
+  }
+
+  @GetMapping("/response-entity")
+  public ResponseEntity<Object> getResponseEntity(@RequestHeader Map<String, String> headers) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("deu um erro");
+  }
+
+  @GetMapping("/response-entity")
+  public ResponseEntity<Object> getResponseEntity(@PathVariable Long id) {
+    var user = new User("jemluz");
+
+    if (id > 5) {
+      return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("deu um erro");
+  }
+
 
   record User(String username)
   {
